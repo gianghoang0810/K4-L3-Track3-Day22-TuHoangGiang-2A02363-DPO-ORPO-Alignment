@@ -59,8 +59,8 @@ print(f"sum log p = {total.item():.3f}   mean log p = {mean.item():.3f}")
 # %%
 def my_dpo_loss(pc, pr, rc, rr, beta=0.1):
     """pc/pr: policy log-prob chosen/rejected; rc/rr: reference. Trả về loss trung bình."""
-    # TODO: viết bằng torch.nn.functional.logsigmoid
-    return None
+    margin = beta * ((pc - rc) - (pr - rr))
+    return -torch.nn.functional.logsigmoid(margin).mean()
 
 
 # %%
@@ -73,6 +73,15 @@ if mine is None:
 else:
     assert torch.allclose(torch.as_tensor(mine), ref_loss, atol=1e-6), (mine, ref_loss)
     print(f"✓ Khớp tham chiếu: {ref_loss.item():.4f}")
+
+# %%
+# Hai kiểm tra thêm cho hàm của bạn: policy = reference ⇒ log 2; khớp công thức đóng.
+same = torch.tensor([-20.0, -35.0])
+assert abs(my_dpo_loss(same, same - 3, same, same - 3).item() - math.log(2)) < 1e-6
+closed = -math.log(1 / (1 + math.exp(-3.5)))  # beta=0.5: (−10+12) − (−20+15) = 7 → 0.5·7 = 3.5
+t = torch.tensor
+assert abs(my_dpo_loss(t([-10.0]), t([-20.0]), t([-12.0]), t([-15.0]), beta=0.5).item() - closed) < 1e-5
+print("✓ my_dpo_loss: log 2 khi policy = reference; khớp công thức đóng")
 
 # %% [markdown]
 # ## 3. Bước 0: mô hình đang học (policy) = reference ⇒ loss = log 2
@@ -120,6 +129,15 @@ for name, (pc_, pr_) in scenarios.items():
 for name, (pc_, pr_) in scenarios.items():
     nll = -pc_ / 10  # NLL trung bình trên 10 token
     print(f"{name:28s} RPO loss {M.rpo_loss(pc_, pr_, ref_c, ref_r, nll, beta=1.0).item():.3f}")
+
+# %% [markdown]
+# ### Trả lời — vì sao margin tăng được trong khi log-xác suất của `chosen` giảm?
+#
+# Loss DPO chỉ phụ thuộc vào **hiệu** của hai reward ngầm, β·[(log π(y_w) − log π_ref(y_w)) − (log π(y_l) − log π_ref(y_l))], không phụ thuộc vào từng reward riêng lẻ. Gradient chỉ yêu cầu khoảng cách này tăng, nên nó vừa kéo log π(y_w) lên vừa đẩy log π(y_l) xuống, và không có gì giữ log π(y_w) ở trên mức của mô hình tham chiếu.
+#
+# Hai câu `chosen` và `rejected` cùng một câu hỏi thường có nhiều token và cấu trúc chung. Khi mô hình hạ xác suất của các token trong `rejected`, xác suất của các token tương tự trong `chosen` cũng bị kéo xuống theo. Nếu log π(y_l) giảm nhanh hơn log π(y_w), margin vẫn tăng và loss vẫn giảm dù reward của `chosen` đã âm; đó chính là kịch bản B ở trên, có loss y hệt kịch bản A. Phần xác suất bị lấy khỏi cả hai câu dồn sang những câu trả lời khác nằm ngoài cặp dữ liệu (likelihood displacement).
+#
+# Vì vậy ở NB3 phải đọc riêng đường `rewards/chosen` chứ không chỉ đọc margin. RPO thêm NLL của `chosen` vào loss để phạt trường hợp xác suất của `chosen` bị đẩy xuống.
 
 # %% [markdown]
 # ## 6. Bốn biến thể trên cùng một cặp

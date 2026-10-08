@@ -36,6 +36,7 @@ from lab22 import data as D
 from lab22 import modeling as MD
 
 assert torch.cuda.is_available(), "DPO needs a CUDA GPU. See HARDWARE-GUIDE.md."
+torch.cuda.reset_peak_memory_stats()  # VRAM đỉnh chỉ tính NB3 (Colab chạy mọi NB trong một kernel)
 assert C.SFT_MERGED.exists(), f"Run NB1 first: {C.SFT_MERGED} missing"
 assert (C.PREF_DIR / "train.parquet").exists(), "Run NB2 first"
 C.ensure_dirs()
@@ -137,6 +138,10 @@ metrics = {
     "eval_reward_gap": final_eval.get("eval_rewards/margins"),
     "eval_reward_accuracy": final_eval.get("eval_rewards/accuracies"),
     "diagnosis": label,
+    "gpu": torch.cuda.get_device_name(0),
+    "gpu_total_gb": round(torch.cuda.get_device_properties(0).total_memory / 1e9, 1),
+    "train_runtime_s": result.metrics.get("train_runtime"),
+    "peak_vram_gb": round(torch.cuda.max_memory_reserved() / 1e9, 2),
 }
 (C.DPO_ADAPTER / "dpo_metrics.json").write_text(json.dumps(metrics, indent=2))
 print(json.dumps(metrics, indent=2))

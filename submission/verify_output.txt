@@ -1,0 +1,11 @@
+==> Verifying submission at /content/lab22
+
+Optional (bonus):
+  · NB3b variants
+  · NB5 GGUF
+  · NB6 benchmark
+  · NB7 GRPO
+  · β-sweep
+
+✓ Core checks passed. Push your repo and paste the URL into the LMS.
+exit=0

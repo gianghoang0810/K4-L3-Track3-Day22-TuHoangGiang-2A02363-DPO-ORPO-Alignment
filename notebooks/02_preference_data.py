@@ -57,6 +57,22 @@ print(f"train={len(train_ds)}  eval={len(eval_ds)}  (no prompt overlap)")
 print(train_ds[0])
 
 # %% [markdown]
+# ### Đọc 3 cặp mẫu
+#
+# Câu `chosen` có thật sự tốt hơn, hay chỉ dài hơn? Ghi nhận xét của bạn vào REFLECTION.
+
+# %%
+import textwrap
+
+for i in range(3):
+    row = train_ds[i]
+    print(f"\n--- Cặp {i + 1} ---")
+    print(f"PROMPT  : {textwrap.shorten(row['prompt'][0]['content'], 300)}")
+    for side in ("chosen", "rejected"):
+        text = row[side][0]["content"]
+        print(f"{side.upper():8s}: ({len(text)} ký tự) {textwrap.shorten(text, 500)}")
+
+# %% [markdown]
 # ## 2. Thiên vị độ dài
 #
 # Nếu phần lớn `chosen` dài hơn `rejected`, DPO có thể học "viết dài hơn" thay vì

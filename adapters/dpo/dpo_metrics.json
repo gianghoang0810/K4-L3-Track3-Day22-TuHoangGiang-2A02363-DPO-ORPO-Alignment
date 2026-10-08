@@ -1,0 +1,26 @@
+{
+  "compute_tier": "T4",
+  "base_model": "unsloth/Qwen3-4B-Instruct-2507-unsloth-bnb-4bit",
+  "reference": "models/sft-merged (precomputed)",
+  "pref_dataset": "sailor2/sea-ultrafeedback-onpolicy",
+  "beta": 0.1,
+  "lr": 5e-06,
+  "loss_type": [
+    "sigmoid"
+  ],
+  "epochs": 1.0,
+  "final_train_loss": 0.6751537704467774,
+  "first_logged_loss": 0.6933385848999023,
+  "end_chosen_reward": 0.38417058628983797,
+  "end_rejected_reward": 0.29456858420744536,
+  "end_reward_gap": 0.0896020014770329,
+  "eval_chosen_reward": 0.40383867982774974,
+  "eval_rejected_reward": 0.3177687842492014,
+  "eval_reward_gap": 0.08606989561580121,
+  "eval_reward_accuracy": 0.68,
+  "diagnosis": "INTENDED",
+  "gpu": "Tesla T4",
+  "gpu_total_gb": 15.6,
+  "train_runtime_s": 2110.9979,
+  "peak_vram_gb": 8.04
+}
