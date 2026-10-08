@@ -161,6 +161,17 @@ _Thành phần reward nào tăng trước (đúng định dạng hay đúng đá
 
 ---
 
+## 10. Đẩy lên HF Hub (bonus)
+
+Repo mô hình (public): https://huggingface.co/gianghf08102k/lab22-qwen3-4b-vi-dpo-v0
+
+- Thư mục gốc: adapter LoRA DPO (`adapter_model.safetensors`, `adapter_config.json`, tokenizer, `dpo_metrics.json`, `split.json`).
+- `sft-mini/`: adapter LoRA SFT. Mô hình SFT đã gộp (~8 GB) không được đẩy lên; thẻ mô tả ghi cách dựng lại (mô hình gốc + `sft-mini/` → gộp → gắn adapter DPO).
+- `ref/`: adapter thứ hai tên `ref` được lưu kèm khi `save_pretrained` adapter DPO (tôi đoán là bản sao adapter tham chiếu do trainer tạo); không cần khi suy luận.
+- Thẻ mô tả (`README.md` trên HF, bản sao ở `submission/hf_model_card.md`) ghi mô hình gốc, dữ liệu SFT và DPO, siêu tham số (β 0.1, lr 5e-6, 1 epoch, LoRA r=16/α=32), số liệu huấn luyện và kết quả chấm của cả RM lẫn giám khảo API, cùng các hạn chế. Giấy phép đặt là CC BY-NC 4.0 vì dữ liệu SFT có giấy phép phi thương mại. Tên repo có "v0" để không bị hiểu nhầm là bản dùng cho môi trường thật.
+
+---
+
 ## Danh sách bonus
 
 - [ ] NB3b — biến thể loss (+8)
@@ -169,7 +180,7 @@ _Thành phần reward nào tăng trước (đúng định dạng hay đúng đá
 - [ ] NB7 — GRPO (+8)
 - [ ] β-sweep (+6)
 - [x] Chấm chéo bằng hai họ mô hình (+4)
-- [ ] Đẩy lên HF Hub + thẻ mô tả mô hình (+3)
+- [x] Đẩy lên HF Hub + thẻ mô tả mô hình (+3)
 - [ ] `BONUS-CHALLENGE.md` (không chấm điểm)
 
 ---
